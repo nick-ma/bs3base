@@ -13,5 +13,5 @@ Gruntfile是主要的入口。
 
 要做的事
 ------
--通过AMD的方式来加载js库
--研究docker部署
+- 通过AMD的方式来加载js库
+- 研究docker部署
