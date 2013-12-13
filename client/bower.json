@@ -1,0 +1,17 @@
+{
+  "name": "bs3base",
+  "version": "0.0.1",
+  "main": "app.js",
+  "description": "bootstrap 3 base project",
+  "license": "BSD",
+  "dependencies": {
+    "jquery": "latest",
+    "lodash": "latest",
+    "almond": "latest",
+    "requirejs": "latest",
+    "backbone-amd": "latest",
+    "backbone.marionette": "latest",
+    "backbone.marionette.handlebars": "latest",
+    "handlebars": "latest"
+  }
+}
