@@ -153,6 +153,12 @@ module.exports = function(grunt) {
         src: ["*"],
         dest: 'client/dist/fonts/'
       },
+      imgs: {
+        expand: true,
+        cwd: "client/src/imgs/",
+        src: ["*"],
+        dest: 'client/dist/imgs/'
+      },
       jquery: {
         src: 'client/src/js/jquery/jquery-1.10.2.js',
         dest: 'client/dist/js/jquery.js'
