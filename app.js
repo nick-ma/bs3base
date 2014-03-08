@@ -13,9 +13,11 @@ var express = require('express'),
     mongoose = require('mongoose'),
     colors = require('colors'),
     passport = require('passport'),
-    LocalStrategy = require('passport-local').Strategy,
+    LocalStrategy = require('passport-local')
+        .Strategy,
     moment = require('moment'),
-    sprintf = require('sprintf').sprintf,
+    sprintf = require('sprintf')
+        .sprintf,
     async = require('async'),
     Grid = require('gridfs-stream'),
     events = require('events'),
@@ -27,7 +29,7 @@ var app = express();
 var mongodb_uri;
 // 页面资源相关-> 页面相关的js，插件相关的js，页面相关的css，插件相关的css
 var path_js_page, path_js_plugins, path_css_page, path_css_plugins;
-app.configure('development', function() { //配置开发环境相关的变量
+app.configure('development', function () { //配置开发环境相关的变量
     app.use(express.errorHandler({
         dumpExceptions: true,
         showStack: true
@@ -38,7 +40,7 @@ app.configure('development', function() { //配置开发环境相关的变量
     path_js_plugins = 'plugins/js';
     path_css_plugins = 'plugins/css';
 });
-app.configure('production', function() { //配置生产环境相关的变量
+app.configure('production', function () { //配置生产环境相关的变量
     app.use(express.errorHandler());
     mongodb_uri = 'mongodb://localhost/dbname?poolSize=10';
     path_js_page = '/pagejs-min';
@@ -50,7 +52,7 @@ app.configure('production', function() { //配置生产环境相关的变量
 mongoose.connect(mongodb_uri);
 var db = mongoose.connection;
 db.on('error', console.error.bind(console, 'connection error:'));
-db.on('open', function() {
+db.on('open', function () {
     console.log(colors.yellow('Connected to Mongoose on ' + mongodb_uri));
 });
 //多语言引擎的配置
@@ -92,7 +94,7 @@ app.use(i18n.handle); // have i18n befor app.router
 app.use(flash()); // use flash function
 app.use(app.router);
 // Remember Me middleware & i18n set language
-app.use(function(req, res, next) {
+app.use(function (req, res, next) {
     if (req.method == 'POST' && req.url == '/login') {
         if (req.body.rememberme) {
             req.session.cookie.maxAge = 2592000000; // 30*24*60*60*1000 Rememeber 'me' for 30 days
@@ -103,11 +105,11 @@ app.use(function(req, res, next) {
     next();
 });
 //设置passport组件
-passport.serializeUser(function(user, done) {
+passport.serializeUser(function (user, done) {
     done(null, user.id);
 });
 
-passport.deserializeUser(function(token, done) {
+passport.deserializeUser(function (token, done) {
     if (!app.locals.login_users) { //lazy init login_users
         app.locals.login_users = {};
     }
@@ -115,13 +117,15 @@ passport.deserializeUser(function(token, done) {
         // console.log('deserializeUser from cache');
         done(null, app.locals.login_users[token])
     } else {
-        User.findById(token).populate('').exec(function(err, user) {
-            // console.log('deserializeUser from database');
-            if (user) {
-                app.locals.login_users[token] = user;
-            };
-            done(err, user);
-        });
+        User.findById(token)
+            .populate('')
+            .exec(function (err, user) {
+                // console.log('deserializeUser from database');
+                if (user) {
+                    app.locals.login_users[token] = user;
+                };
+                done(err, user);
+            });
     }
 });
 app.use(passport.initialize()); //initialing passport midleware
@@ -132,16 +136,19 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.locals.APP_NAME = APP_NAME;
 // 注册helper函数
 app.locals({
-    toISODate: function(date) {
-        return util.isDate(date) ? moment(date).format('YYYY-MM-DD') : date;
+    toISODate: function (date) {
+        return util.isDate(date) ? moment(date)
+            .format('YYYY-MM-DD') : date;
     },
-    toISOTime: function(date) {
-        return util.isDate(date) ? moment(date).format('HH:mm:ss') : date;
+    toISOTime: function (date) {
+        return util.isDate(date) ? moment(date)
+            .format('HH:mm:ss') : date;
     },
-    toISODatetime: function(date) {
-        return util.isDate(date) ? moment(date).format('YYYY-MM-DD HH:mm:ss') : date;
+    toISODatetime: function (date) {
+        return util.isDate(date) ? moment(date)
+            .format('YYYY-MM-DD HH:mm:ss') : date;
     },
-    calcSize: function(size) {
+    calcSize: function (size) {
         if (size < 1024) {
             return sprintf('%0.2f B', size);
         } else if (size >= 1024 && size < 1048576) { //1024 * 1024
@@ -152,14 +159,14 @@ app.locals({
             return springf('%0.2f GB', size / 1073741824);
         };
     },
-    handle500: function(err, req, res) {
+    handle500: function (err, req, res) {
         res.status(500);
         res.render('500.jade', {
             title: '500: Internal Server Error',
             error: err
         });
     },
-    handle404: function(err, req, res) {
+    handle404: function (err, req, res) {
         res.status(404);
     },
 
@@ -189,7 +196,7 @@ i18n.serveWebTranslate(app, {
         fallbackLng: "zh",
         dynamicLoad: true
     },
-    authenticated: function(req, res) {
+    authenticated: function (req, res) {
         //return req.user;
         return true; //for dev
     }
@@ -203,7 +210,7 @@ if ('development' == app.get('env')) {
 // app.get('/users', user.list);
 
 // Handle 404 － last chance
-app.use(function(req, res) {
+app.use(function (req, res) {
     //console.log('message in 404');
     res.status(404);
     res.render('404.jade', {
@@ -212,7 +219,7 @@ app.use(function(req, res) {
 });
 
 // Handle 500 － last chance
-app.use(function(error, req, res, next) {
+app.use(function (error, req, res, next) {
     // throw error;
     console.log(util.inspect(error, {
         depth: null
@@ -224,10 +231,12 @@ app.use(function(error, req, res, next) {
     });
 });
 
-var server = http.createServer(app).listen(app.get('port'), function() {
-    var env_msg = (app.get('env') == 'development') ? colors.green(app.get('env')) : colors.red(app.get('env'));
-    console.log("Express server listening on port " + colors.green(app.get('port')) + ' in ' + env_msg + ' mode.');
-}).on('close', function() {
-    console.log(colors.red('terminating server'));
-    client.quit();
-});
+var server = http.createServer(app)
+    .listen(app.get('port'), function () {
+        var env_msg = (app.get('env') == 'development') ? colors.green(app.get('env')) : colors.red(app.get('env'));
+        console.log("Express server listening on port " + colors.green(app.get('port')) + ' in ' + env_msg + ' mode.');
+    })
+    .on('close', function () {
+        console.log(colors.red('terminating server'));
+        client.quit();
+    });
